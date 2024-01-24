@@ -59,7 +59,7 @@ impl NetConfigSpaceState {
 // NOTICE: Any changes to this structure require a snapshot version bump.
 pub struct NetState {
     id: String,
-    tap_if_name: String,
+    pub tap_if_name: String,
     rx_rate_limiter_state: RateLimiterState,
     tx_rate_limiter_state: RateLimiterState,
     /// The associated MMDS network stack.

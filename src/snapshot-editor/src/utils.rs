@@ -23,6 +23,8 @@ pub enum UtilsError {
     OutputFileOpen(std::io::Error),
     /// Can not save snapshot: {0}
     VmStateSave(snapshot::Error),
+    /// Can not find network device
+    NetDeviceNotFound(std::io::Error),
 }
 
 #[allow(unused)]

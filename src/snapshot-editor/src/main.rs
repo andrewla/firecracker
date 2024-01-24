@@ -4,13 +4,11 @@
 use clap::{Parser, Subcommand};
 
 mod edit_memory;
-#[cfg(target_arch = "aarch64")]
 mod edit_vmstate;
 mod info;
 mod utils;
 
 use edit_memory::{edit_memory_command, EditMemoryError, EditMemorySubCommand};
-#[cfg(target_arch = "aarch64")]
 use edit_vmstate::{edit_vmstate_command, EditVmStateError, EditVmStateSubCommand};
 use info::{info_vmstate_command, InfoVmStateError, InfoVmStateSubCommand};
 
@@ -18,7 +16,6 @@ use info::{info_vmstate_command, InfoVmStateError, InfoVmStateSubCommand};
 enum SnapEditorError {
     /// Error during editing memory file: {0}
     EditMemory(#[from] EditMemoryError),
-    #[cfg(target_arch = "aarch64")]
     /// Error during editing vmstate file: {0}
     EditVmState(#[from] EditVmStateError),
     /// Error during getting info from a vmstate file: {0}
@@ -36,7 +33,6 @@ struct Cli {
 enum Command {
     #[command(subcommand)]
     EditMemory(EditMemorySubCommand),
-    #[cfg(target_arch = "aarch64")]
     #[command(subcommand)]
     EditVmstate(EditVmStateSubCommand),
     #[command(subcommand)]
@@ -48,7 +44,6 @@ fn main_exec() -> Result<(), SnapEditorError> {
 
     match cli.command {
         Command::EditMemory(command) => edit_memory_command(command)?,
-        #[cfg(target_arch = "aarch64")]
         Command::EditVmstate(command) => edit_vmstate_command(command)?,
         Command::InfoVmstate(command) => info_vmstate_command(command)?,
     }

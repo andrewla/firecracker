@@ -4,7 +4,9 @@
 use std::path::PathBuf;
 
 use clap::Subcommand;
+#[cfg(target_arch = "aarch64")]
 use clap_num::maybe_hex;
+#[cfg(target_arch = "aarch64")]
 use vmm::arch::aarch64::regs::Aarch64RegisterVec;
 use vmm::persist::MicrovmState;
 
@@ -19,6 +21,7 @@ pub enum EditVmStateError {
 #[derive(Debug, Subcommand)]
 pub enum EditVmStateSubCommand {
     /// Remove registers from vcpu states.
+    #[cfg(target_arch = "aarch64")]
     RemoveRegs {
         /// Set of registers to remove.
         /// Values should be registers ids as the are defined in KVM.
@@ -31,16 +34,47 @@ pub enum EditVmStateSubCommand {
         #[arg(short, long)]
         output_path: PathBuf,
     },
+
+    /// Rename network tap device
+    RenameNetTap {
+        /// The new name of the tap device
+        #[arg(short, long)]
+        iface_name: String,
+
+        /// Path to the vmstate file.
+        #[arg(short, long)]
+        vmstate_path: PathBuf,
+
+        /// Path of output file.
+        #[arg(short, long)]
+        output_path:
+            PathBuf,
+    },
 }
 
 pub fn edit_vmstate_command(command: EditVmStateSubCommand) -> Result<(), EditVmStateError> {
     match command {
+        #[cfg(target_arch = "aarch64")]
         EditVmStateSubCommand::RemoveRegs {
             regs,
             vmstate_path,
             output_path,
         } => edit(&vmstate_path, &output_path, |state| {
             remove_regs(state, &regs)
+        })?,
+
+        EditVmStateSubCommand::RenameNetTap {
+            iface_name,
+            vmstate_path,
+            output_path,
+        } => edit(&vmstate_path, &output_path, |mut state| {
+            let net_device = state
+                .device_states
+                .net_devices
+                .get_mut(0)
+                .unwrap();
+            net_device.device_state.tap_if_name = iface_name.clone();
+            Ok(state)
         })?,
     }
     Ok(())
@@ -57,6 +91,7 @@ fn edit(
     Ok(())
 }
 
+#[cfg(target_arch = "aarch64")]
 fn remove_regs(
     mut state: MicrovmState,
     remove_regs: &[u64],
