@@ -75,6 +75,27 @@ Firecracker snapshot consists of 2 files:
 >     0x1 0x2
 > ```
 
+#### `rename-net-tap` command
+
+> This command is used to modify the tap device used by a snapshot. This allows
+> portability of snapshots between different interfaces. After snapshot restore
+> the VM will still have to modify its network state.
+>
+> Arguments:
+>
+> - `VMSTATE_PATH` - path to the `vmstate` file
+> - `OUTPUT_PATH` - path where the output wil be written
+> - `IFACE_NAME` - the new tap interface to use
+>
+> Usage:
+>
+> ```bash
+> snapshot-editor edit-vmstate rename-net-tap \
+>     --vmstate-path ./vmstate_file \
+>     --output-path ./new_vmstate_file \
+>     --iface-name vmtap04
+> ```
+
 ### `info-vmstate` command
 
 #### `version` subcommand
